@@ -49,6 +49,10 @@ func main() {
 		c.String(http.StatusOK, string(blackfriday.Run([]byte("**hi!**"))))
 	})
 
+	router.GET("/test", func(c *gin.Context) {
+		c.String(http.StatusOK, string(blackfriday.Run([]byte("**test**"))))
+	})
+
 	router.GET("/repeat", repeatHandler(repeat))
 
 	router.Run(":" + port)
