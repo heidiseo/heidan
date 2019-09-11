@@ -1,18 +1,22 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
-/*type Joke struct {
-	msg string
+*type Joke struct {
+	Msg string `json:"-"`
 }
 
-type Jokes []Joke
 
 func repeatHandler(r int) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -22,25 +26,11 @@ func repeatHandler(r int) gin.HandlerFunc {
 		}
 		c.String(http.StatusOK, buffer.String())
 	}
-}*/
+}
 
 func main() {
-	client := &http
-	response, err := http.Get("https://icanhazdadjoke.com")
-	response.Header.Add()
-headers:
-	{
-	Accept:
-		"application/json"
-	}
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-	} else {
-		data, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(string(data))
-	}
 
-	/*port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 
 		if port == "" {
 			log.Fatal("$PORT must be set")
@@ -72,18 +62,23 @@ headers:
 
 		router.GET("/repeat", repeatHandler(repeat))
 
-		router.GET("/jokes", showJokes())
-	)
+		router.GET("/jokes", showJokes)
 
-		router.Run(":" + port)*/
+		router.Run(":" + port)
 }
 
-/*func showJokes(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Body()
-	logging.Info(ctx, logging.Data{}, jokes accessed)
-    jokes := Jokes{
-        Joke{msg: ctx.msg},
-    }
-    json.NewEncoder(w).Encode(jokes)
+func showJokes(w http.ResponseWriter, r *http.Request) {
+	var joke = Joke{}
+	err := json.NewDecoder(r.Body).Decode(&joke)
+	if err != nil {
+		panic(err)
+	}
+	jokeJson, err := json.Marshal(joke)
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jokeJson)
 }
-*/
+
