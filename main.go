@@ -12,9 +12,9 @@ import (
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
-/*type Joke struct {
-	Msg string `json:"-"`
-}*/
+type Joke struct {
+	Message string `json:"message"`
+}
 
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 
 	router.GET("/repeat", repeatHandler(repeat))
 
-	//router.GET("/joke", jokeHandler(repeat))
+	router.GET("/joke", jokeHandler())
 
 	router.Run(":" + port)
 }
@@ -67,13 +67,16 @@ func repeatHandler(r int) gin.HandlerFunc {
 	}
 }
 
-/*func jokeHandler(r int) gin.HandlerFunc {
+//{
+//	body: {
+//		message: 'I am a JSON'
+//	}
+//}
+
+func jokeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var buffer bytes.Buffer
-		for i := 0; i < r; i++ {
-			buffer.WriteString("Hello from Go!\n")
-		}
-		c.JSON(http.StatusOK, buffer.String())
+		joke := Joke{Message: "댄 is 바보"}
+		c.JSON(http.StatusOK, joke)
 	}
 }
 
