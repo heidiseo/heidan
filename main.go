@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/russross/blackfriday"
@@ -24,7 +24,7 @@ func repeatHandler(r int) gin.HandlerFunc {
 
 func main() {
 	port := os.Getenv("PORT")
-
+	fmt.Printf("port is %v\n", port)
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
