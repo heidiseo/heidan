@@ -76,6 +76,8 @@ func repeatHandler(r int) gin.HandlerFunc {
 func jokeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		joke := Joke{Message: "댄 is 바보"}
+		c.Header("content-type", "application/json")
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.JSON(http.StatusOK, joke)
 	}
 }
