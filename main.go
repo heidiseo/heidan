@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	//"encoding/json"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -12,8 +12,8 @@ import (
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
-type Joke struct {
-	Message string `json:"message"`
+type DadJoke struct {
+	Joke string `json:"joke"`
 }
 
 
@@ -67,80 +67,29 @@ func repeatHandler(r int) gin.HandlerFunc {
 	}
 }
 
-//{
-//	body: {
-//		message: 'I am a JSON'
-//	}
-//}
-
 func jokeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		joke := Joke{Message: "댄 is 바보"}
+		response, err := http.NewRequest("GET", "https://icanhazdadjoke.com", nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+		response.Header.Set("Accept", "application/json")
+		resp, err := http.DefaultClient.Do(response)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var results map[string]interface{}
+		err = json.NewDecoder(resp.Body).Decode(&results)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		jokeString := results["joke"].(string)
+		joke := DadJoke{Joke: jokeString}
 		c.Header("content-type", "application/json")
 		c.Header("Access-Control-Allow-Origin", "*")
+		//fmt.Printf("joke is: %v", dadJoke.Joke)
 		c.JSON(http.StatusOK, joke)
 	}
 }
-
-//ShowJokes is a function that has http reader and writer and returns JSON
-//
-/*func ShowJokes(w http.ResponseWriter, r *http.Request) {
-	var joke= Joke{}
-	err := json.NewDecoder(r.Body).Decode(&joke)
-	if err != nil {
-		panic(err)
-	}
-	jokeJson, err := json.Marshal(joke)
-	if err != nil {
-		panic(err)
-	}
-	w.Header.Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jokeJson)
-}
-
-/*func OwnJokes(w http.ResponseWriter, r *http.Request) {
-	var joke = Joke{}
-	err := json.NewDecoder(r.Body).Decode(&joke)
-	if err != nil {
-		panic(err)
-	}
-	jokeJson, err := json.Marshal(joke)
-	if err != nil {
-		panic(err)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jokeJson)
-}
-
-func SayJokes(jokef func (w http.ResponseWriter, r *http.Request)) {
-
-}
-
-
-/*
-
-import axios from "axios"
-
-export async function handler(event, context) {
-  try {
-    const response = await axios.get("https://icanhazdadjoke.com", { headers: { Accept: "application/json" } })
-    const data = response.data
-    return {
-      statusCode: 200,
-      headers: {
-        'content-type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({ msg: data.joke })
-    }
-  } catch (err) {
-    console.log(err) // output to netlify function log
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ msg: err.message }) // Could be a custom message or object i.e. JSON.stringify(err)
-    }
-  }
-} */
-

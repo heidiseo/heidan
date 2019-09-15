@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gin-gonic/gin v0.0.0-20150626140855-4cc2de6207f4 h1:ufr+93X0/9xTNvObfvbHsEkgCk8BrhmUH83Z8YIhzXE=
 github.com/gin-gonic/gin v0.0.0-20150626140855-4cc2de6207f4/go.mod h1:7cKuhb5qV2ggCFctp2fJQ+ErvciLZrIeoOSOm6mUr7Y=
+github.com/gorilla/http v0.0.0-20190627042742-d268792bdee7 h1:bFJgNQQcl/uBD2BuTZGYZ3lDomhIxCcn8r812nV0YmY=
+github.com/gorilla/http v0.0.0-20190627042742-d268792bdee7/go.mod h1:7SoxxYlLs8XfoT5AXYy1WWMqjg3iaA9gZblNHzXQDqo=
 github.com/gorilla/mux v1.7.3 h1:gnP5JzjVOuiZD07fKKToCAOjS0yOpj/qPETTXCCS6hw=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/heroku/x v0.0.0-20171004170240-705849e307dd h1:zn29UrzyUeQgqxBGXIwQqQJf75IiK4aeCtO5q1V2Vyo=
