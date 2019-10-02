@@ -1,95 +1,57 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
+	"fmt"
 	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"github.com/gin-gonic/gin"
-	"github.com/russross/blackfriday"
-	_ "github.com/heroku/x/hmetrics/onload"
+
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 )
-
-type DadJoke struct {
-	Joke string `json:"joke"`
-}
-
 
 func main() {
 
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
-
-	tStr := os.Getenv("REPEAT")
-	repeat, err := strconv.Atoi(tStr)
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("./firebaseKey.json")
+	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
-		log.Printf("Error converting $REPEAT to an int: %q - Using default\n", err)
-		repeat = 5
+		log.Fatalln(err)
 	}
 
-	router := gin.New()
-	router.Use(gin.Logger())
-	router.LoadHTMLGlob("templates/*.tmpl.html")
-	router.Static("/static", "static")
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	ReadFromFirestore(ctx, client)
+	AddToFirestore(ctx, client)
+	//ReadFromFirestore(ctx, client)
 
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl.html", nil)
-	})
-
-	router.GET("/mark", func(c *gin.Context) {
-		c.String(http.StatusOK, string(blackfriday.Run([]byte("**hi!**"))))
-	})
-
-	router.GET("/test", func(c *gin.Context) {
-		c.String(http.StatusOK, string(blackfriday.Run([]byte("**hi!**"))))
-	})
-
-	router.GET("/repeat", repeatHandler(repeat))
-
-	router.GET("/joke", jokeHandler())
-
-	router.Run(":" + port)
+	defer client.Close()
 }
 
-
-func repeatHandler(r int) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var buffer bytes.Buffer
-		for i := 0; i < r; i++ {
-			buffer.WriteString("Hello from Go!\n")
+//ReadFromFirestore function will read data from firestore
+func ReadFromFirestore(ctx context.Context, c *firestore.Client) {
+	iter := c.Collection("adventures").Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
 		}
-		c.String(http.StatusOK, buffer.String())
+		if err != nil {
+			log.Fatalf("Failed to iterate: %v", err)
+		}
+		fmt.Println(doc.Data())
 	}
 }
 
-func jokeHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		response, err := http.NewRequest("GET", "https://icanhazdadjoke.com", nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-		response.Header.Set("Accept", "application/json")
-		resp, err := http.DefaultClient.Do(response)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var results map[string]interface{}
-		err = json.NewDecoder(resp.Body).Decode(&results)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		jokeString := results["joke"].(string)
-		joke := DadJoke{Joke: jokeString}
-		c.Header("content-type", "application/json")
-		c.Header("Access-Control-Allow-Origin", "*")
-		//fmt.Printf("joke is: %v", dadJoke.Joke)
-		c.JSON(http.StatusOK, joke)
+//AddToFirestore will add data to firestore
+func AddToFirestore(ctx context.Context, c *firestore.Client) {
+	_, _, err := c.Collection("adventures").Add(ctx, map[string]interface{}{
+		"concert": "Jon Bellion",
+	})
+	if err != nil {
+		log.Fatalf("Failed adding alovelace: %v", err)
 	}
 }
