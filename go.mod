@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/firestore v1.0.0
 	cloud.google.com/go/storage v1.1.0 // indirect
 	firebase.google.com/go v3.9.0+incompatible
+	github.com/aws/aws-sdk-go v1.25.11 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect
